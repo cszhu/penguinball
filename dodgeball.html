@@ -1,0 +1,170 @@
+
+<!DOCTYPE HTML>
+<html>
+  
+  <head>
+  <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
+
+  <style>
+  h1 {font-family: Raleway; font-size: 22px}
+  p {font-family: Raleway}
+
+  </style>
+    <script type="text/javascript">
+      // Global variables
+      var snowballX = 15; // snowball x position.
+      var snowballY = 15; // snowball y position.
+      var snowballDX = 5; // Change in snowball x position.
+      var snowballDY = 7; // Change in snowball y position.
+      var boardX = 500; // Board width.
+      var boardY = 500; // Board height.
+      var penguinX = 250; // penguin location.
+      var penguinY = 250; // penguin location
+      var penguinH = 40; // penguin height.
+      var penguinD = boardY - penguinH; // penguin depth.
+      var penguinW = 40; // penguin width.
+      var score = 0;
+
+      var fishX = 100;
+      var fishY = 120;
+
+      var bg = new Audio('Main Theme.mp3');
+      var eat = new Audio('blop.mp3');
+      var punch = new Audio('punch.mp3'); 
+
+      bg.addEventListener('ended', function() {
+          this.currentTime = 0;
+          this.play();
+      }, false);
+
+      // This function is called on page load.
+      function drawGameSVG() {
+
+        bg.play();  
+        // Play the game until the snowball stops.
+        gameLoop = setInterval(drawsnowball, 16);
+        // Add keyboard listener.
+        window.addEventListener('keydown', whatKey, true);
+      }
+
+      function drawsnowball() {
+
+        // Change the snowball location.
+        snowballX += snowballDX;
+        snowballY += snowballDY;
+        snowball.setAttribute("cx", snowballX);
+        snowball.setAttribute("cy", snowballY);
+
+        //Get punched
+        if (snowballX < (penguinX + 20) && snowballX > (penguinX - 20)
+          && snowballY < (penguinY + 30) && snowballY > (penguinY - 30)) {
+          punch.play();
+          clearInterval(gameLoop);
+          alert("Game over! Your score is " + score);
+          score = 0;
+        }
+
+        //Eat fish
+        if (fishX < (penguinX + 20) && fishX > (penguinX - 20)
+          && fishY < (penguinY + 30) && fishY > (penguinY - 30)) {
+          eat.play();
+          score += 10;
+          document.getElementById("score").innerHTML = "<p id='score'><b>Score:</b> " + score + "</p>";
+
+          randX = Math.floor((Math.random() * 450)+10);
+          randY = Math.floor((Math.random() * 450)+10);
+        
+          fish.setAttribute("x", randX);
+          fish.setAttribute("y", randY);
+          fishX = randX;
+          fishY = randY;
+        }
+
+        // Bounce on a left or right edge.
+        if (snowballX + snowballDX > boardX - 15 || snowballX + snowballDX < 15) 
+        {
+          snowballDX = -snowballDX;
+          score++;
+          document.getElementById("score").innerHTML = "<p id='score'><b>Score:</b> " + score + "</p>";
+        }
+
+        // If snowball hits the top, bounce it. 
+        if (snowballY + snowballDY < 15) 
+        {
+          snowballDY = -snowballDY;
+          score++;
+          document.getElementById("score").innerHTML = "<p id='score'><b>Score:</b> " + score + "</p>";
+
+        }
+
+        // If the snowball hits the bottom, check see if it hits a penguin.
+        else if (snowballY + snowballDY > boardY - 15) {
+          // If the snowball hits the penguin, bounce it.
+          snowballDY = -snowballDY;
+          score++;
+          document.getElementById("score").innerHTML = "<p id='score'><b>Score:</b> " + score + "</p>";
+
+        }
+      }
+
+      // Get key press.
+      function whatKey(evt) {
+
+        switch (evt.keyCode) {
+          // Left arrow.
+        case 37:
+          penguinX = penguinX - 20;
+          if (penguinX < 0) penguinX = 0;
+          penguin.setAttribute("x", penguinX);
+          break;
+
+          // Up arrow
+        case 38:
+          penguinY = penguinY - 20;
+
+          if (penguinY < 0) 
+              penguinY = 0;
+          penguin.setAttribute("y", penguinY);
+          break;  
+
+          // Right arrow.
+        case 39:
+          penguinX = penguinX + 20;
+          if (penguinX > boardX - penguinW) penguinX = boardX - penguinW;
+          penguin.setAttribute("x", penguinX);
+          break;
+
+          // Down arrow
+        case 40:
+          penguinY = penguinY + 20;
+
+          if (penguinY > boardY - penguinH) penguinY = boardY - penguinH;
+          penguin.setAttribute("y", penguinY);
+          break;   
+        }
+      }
+    </script>
+  </head>
+  <center>
+  <body onload="drawGameSVG()">
+    <h1 font="Raleway">
+      <b>Snow Dodgeball</b>
+    </h1>
+    <p>Eat the fish while dodging the snowball!<br>
+    Snowball Bounce +1<br> Fish +10</p>
+    <p id="score"><b>Score:</b> 0</p>
+    <!-- Create the SVG pane. -->
+    <svg xmlns="http://www.w3.org/2000/svg" height="500" width="500">
+      <!-- Create the board. -->
+      <rect x="1" y="1" width="500" height="500" fill="lightblue" id="board" />
+      <!-- Create the snowball. -->
+      <circle cx="150" cy="150" r="15" fill="white" id="snowball" />
+      <!-- Create the penguin. -->
+      <image xlink:href="penguin.png" x="250" y="250" width="40" height="40" id="penguin"/>
+      <!--Create the fish. -->
+      <image xlink:href="fish.png" x="100" y="120" width="40" height="40" id="fish"/>
+
+    </svg>
+  </body>
+
+</html>
